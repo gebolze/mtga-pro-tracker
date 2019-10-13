@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace MTGApro
 {
     /// <summary>
-    /// Логика взаимодействия для Window3.xaml
+    /// Логика взаимодействия для ErrorReportWindow.xaml
     /// </summary>
     /// 
 
-    public partial class WindowErr : Window
+    public partial class ErrorReportWindow : Window
     {
 
         public class Notifi
@@ -35,7 +35,7 @@ namespace MTGApro
             }
         }
 
-        public WindowErr()
+        public ErrorReportWindow()
         {
            OutputText.Text = MainWindow.errreport;
 
