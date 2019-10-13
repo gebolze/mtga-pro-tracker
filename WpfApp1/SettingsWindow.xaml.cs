@@ -190,7 +190,7 @@ namespace MTGApro
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void SaveSettingsButton_Click(object sender, RoutedEventArgs e)
         {
 
             if (Startupchk.IsChecked == true)
@@ -291,7 +291,7 @@ namespace MTGApro
             Environment.Exit(0);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void LocateGameLogButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -351,7 +351,7 @@ namespace MTGApro
             }
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void RemoveAccountButton_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
 

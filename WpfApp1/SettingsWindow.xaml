@@ -46,7 +46,7 @@
                         </StackPanel>
                     </ComboBox>
                     <TextBlock Text="App Icon" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.513,0.121"/>
-                    <Button x:Name="LocateBtn" Content="Locate Game Log..." HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Width="229" Click="Button_Click_1"/>
+                    <Button x:Name="LocateBtn" Content="Locate Game Log..." HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Width="229" Click="LocateGameLogButton_Click"/>
                     <TextBlock Text="Use this tool ONLY if your log is not being &#xD;&#xA;located automatically" HorizontalAlignment="Left" Margin="10,152,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.513,0.121"/>
                 </Grid>
             </TabItem>
@@ -98,10 +98,10 @@
                     <TextBlock x:Name="Ingame_nick_label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,53,0,0" Width="90" Height="14"/>
                     <Label x:Name="Acc_token"  Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="104,81,0,0" FontWeight="Bold" Width="143" Height="23"/>
                     <TextBlock x:Name="Token_label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,85,0,0" Width="90" Height="14"/>
-                    <Button Content="Remove Token-Account Link" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top" Width="232" Click="Button_Click_2"/>
+                    <Button Content="Remove Token-Account Link" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top" Width="232" Click="RemoveAccountButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Content="Save settings" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top" Width="234" Click="Button_Click"/>
+        <Button Content="Save settings" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top" Width="234" Click="SaveSettingsButton_Click"/>
     </Grid>
 </Window>
