@@ -37,7 +37,7 @@ namespace MTGApro
         private static extern IntPtr GetForegroundWindow();
 
 
-        public Window4 win4 = new Window4();
+        public MatchOverlayWindow matchOverlayWindow = new MatchOverlayWindow();
         public static Parser[] indicators; //Indicators for log parsing recieved from server
         public static string[] dateformats;
         public static string datesample = @"";
@@ -1265,30 +1265,30 @@ namespace MTGApro
 
                                                     if (stuff.gameObjects[irp].ownerSeatId == TheMatch.Teamid)
                                                     {
-                                                        if (!TheMatch.Udeckinst.ContainsKey((int)stuff.gameObjects[irp].instanceId) && stuff.gameObjects[irp].visibility == @"Visibility_Private" && Window4.cdb_mtga_id.ContainsKey((int)stuff.gameObjects[irp].grpId))
+                                                        if (!TheMatch.Udeckinst.ContainsKey((int)stuff.gameObjects[irp].instanceId) && stuff.gameObjects[irp].visibility == @"Visibility_Private" && MatchOverlayWindow.cdb_mtga_id.ContainsKey((int)stuff.gameObjects[irp].grpId))
                                                         {
-                                                            if (!TheMatch.Udeck.ContainsKey(Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]))
+                                                            if (!TheMatch.Udeck.ContainsKey(MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]))
                                                             {
-                                                                TheMatch.Udeck.Add(Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId], 1);
+                                                                TheMatch.Udeck.Add(MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId], 1);
                                                             }
                                                             else
                                                             {
-                                                                TheMatch.Udeck[Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]]++;
+                                                                TheMatch.Udeck[MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]]++;
                                                             }
                                                             TheMatch.Udeckinst.Add((int)stuff.gameObjects[irp].instanceId, (int)stuff.gameObjects[irp].grpId);
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        if (!TheMatch.Edeckinst.ContainsKey((int)stuff.gameObjects[irp].instanceId) && stuff.gameObjects[irp].visibility == @"Visibility_Public" && Window4.cdb_mtga_id.ContainsKey((int)stuff.gameObjects[irp].grpId))
+                                                        if (!TheMatch.Edeckinst.ContainsKey((int)stuff.gameObjects[irp].instanceId) && stuff.gameObjects[irp].visibility == @"Visibility_Public" && MatchOverlayWindow.cdb_mtga_id.ContainsKey((int)stuff.gameObjects[irp].grpId))
                                                         {
-                                                            if (!TheMatch.Edeck.ContainsKey(Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]))
+                                                            if (!TheMatch.Edeck.ContainsKey(MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]))
                                                             {
-                                                                TheMatch.Edeck.Add(Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId], 1);
+                                                                TheMatch.Edeck.Add(MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId], 1);
                                                             }
                                                             else
                                                             {
-                                                                TheMatch.Edeck[Window4.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]]++;
+                                                                TheMatch.Edeck[MatchOverlayWindow.cdb_mtga_id[(int)stuff.gameObjects[irp].grpId]]++;
                                                             }
                                                             TheMatch.Edeckinst.Add((int)stuff.gameObjects[irp].instanceId, (int)stuff.gameObjects[irp].grpId);
                                                         }
@@ -1319,13 +1319,13 @@ namespace MTGApro
                                                 {
                                                     for (int irp = 0; irp < stuff.draftPack.Count; irp++)
                                                     {
-                                                        if (!TheMatch.Draftdeck.ContainsKey(Window4.cdb_mtga_id[(int)stuff.draftPack[irp]]))
+                                                        if (!TheMatch.Draftdeck.ContainsKey(MatchOverlayWindow.cdb_mtga_id[(int)stuff.draftPack[irp]]))
                                                         {
-                                                            TheMatch.Draftdeck.Add(Window4.cdb_mtga_id[(int)stuff.draftPack[irp]], 1);
+                                                            TheMatch.Draftdeck.Add(MatchOverlayWindow.cdb_mtga_id[(int)stuff.draftPack[irp]], 1);
                                                         }
                                                         else
                                                         {
-                                                            TheMatch.Draftdeck[Window4.cdb_mtga_id[(int)stuff.draftPack[irp]]]++;
+                                                            TheMatch.Draftdeck[MatchOverlayWindow.cdb_mtga_id[(int)stuff.draftPack[irp]]]++;
                                                         }
                                                     }
                                                 }
@@ -2104,7 +2104,7 @@ namespace MTGApro
                             IntPtr activatedHandle = GetForegroundWindow();
                             gamefocused = false;
 
-                            WindowInteropHelper wih = new WindowInteropHelper(win4);
+                            WindowInteropHelper wih = new WindowInteropHelper(matchOverlayWindow);
                             IntPtr Handle = wih.Handle;
 
                             foreach (Process p in locator)
@@ -2135,13 +2135,13 @@ namespace MTGApro
                                 {
                                     try
                                     {
-                                        if (overlayactive && !juststarted && !Window4.windowhidden && (ovlsettings.Decklist || TheMatch.IsDrafting || TheMatch.IsFighting))
+                                        if (overlayactive && !juststarted && !MatchOverlayWindow.windowhidden && (ovlsettings.Decklist || TheMatch.IsDrafting || TheMatch.IsFighting))
                                         {
-                                            if (win4.IsVisible == false)
+                                            if (matchOverlayWindow.IsVisible == false)
                                             {
-                                                win4.Show();
+                                                matchOverlayWindow.Show();
                                             }
-                                            if (TheMatch.Hasnewdata || !Window4.wasshown) win4.updatelive();
+                                            if (TheMatch.Hasnewdata || !MatchOverlayWindow.wasshown) matchOverlayWindow.updatelive();
                                             TheMatch.Hasnewdata = false;
                                         }
                                     }
@@ -2157,9 +2157,9 @@ namespace MTGApro
                                 {
                                     try
                                     {
-                                        if (win4.IsVisible == true)
+                                        if (matchOverlayWindow.IsVisible == true)
                                         {
-                                            win4.Hide();
+                                            matchOverlayWindow.Hide();
                                         }
                                     }
                                     catch (Exception ee)
@@ -2197,9 +2197,9 @@ namespace MTGApro
                             {
                                 Dispatcher.BeginInvoke(new ThreadStart(delegate
                                 {
-                                    if (win4.IsVisible == true)
+                                    if (matchOverlayWindow.IsVisible == true)
                                     {
-                                        win4.Hide();
+                                        matchOverlayWindow.Hide();
                                     }
                                 }));
                             }
@@ -2554,9 +2554,9 @@ namespace MTGApro
                 {
                     overlayactive = false;
                     ovactbut.Text = "Activate In-game overlay";
-                    if (win4.IsVisible == true)
+                    if (matchOverlayWindow.IsVisible == true)
                     {
-                        win4.Hide();
+                        matchOverlayWindow.Hide();
                     }
                 }
                 SetAppData();

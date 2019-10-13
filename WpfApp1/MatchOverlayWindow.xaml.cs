@@ -22,9 +22,9 @@ using System.Windows.Resources;
 namespace MTGApro
 {
     /// <summary>
-    /// Логика взаимодействия для Window4.xaml
+    /// Логика взаимодействия для MatchOverlayWindow.xaml
     /// </summary>
-    public partial class Window4 : Window
+    public partial class MatchOverlayWindow : Window
     {
 
         private Window5 win5 = new Window5();
@@ -1063,7 +1063,7 @@ namespace MTGApro
             }
         }
 
-        public Window4()
+        public MatchOverlayWindow()
         {
             InitializeComponent();
             Closing += Window4_Closing;
@@ -1201,11 +1201,11 @@ namespace MTGApro
 
 
         #region ScaleValue Depdency Property
-        public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue", typeof(double), typeof(Window4), new UIPropertyMetadata(1.0, new PropertyChangedCallback(OnScaleValueChanged), new CoerceValueCallback(OnCoerceScaleValue)));
+        public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue", typeof(double), typeof(MatchOverlayWindow), new UIPropertyMetadata(1.0, new PropertyChangedCallback(OnScaleValueChanged), new CoerceValueCallback(OnCoerceScaleValue)));
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
-            Window4 mainWindow = o as Window4;
+            MatchOverlayWindow mainWindow = o as MatchOverlayWindow;
             if (mainWindow != null)
                 return mainWindow.OnCoerceScaleValue((double)value);
             else
@@ -1214,7 +1214,7 @@ namespace MTGApro
 
         private static void OnScaleValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            Window4 mainWindow = o as Window4;
+            MatchOverlayWindow mainWindow = o as MatchOverlayWindow;
             if (mainWindow != null)
                 mainWindow.OnScaleValueChanged((double)e.OldValue, (double)e.NewValue);
         }
