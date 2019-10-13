@@ -2658,9 +2658,9 @@ namespace MTGApro
         {
             try
             {
-                Window3 win3 = new Window3();
+                NotificationsWindow notificationsWindow = new NotificationsWindow();
                 Messenger.Visibility = Visibility.Hidden;
-                win3.Show();
+                notificationsWindow.Show();
             }
             catch (Exception ee)
             {
