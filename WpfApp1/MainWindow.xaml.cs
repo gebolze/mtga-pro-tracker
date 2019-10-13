@@ -80,8 +80,8 @@ namespace MTGApro
         // public static Dictionary<double, Curmatchforupload> matchdetails = new Dictionary<double, Curmatchforupload>();
         public static string[] hashes;
         public static double parsedtill = 0;
-        public static Window1.AppSettingsStorage appsettings = new Window1.AppSettingsStorage();
-        public static Window1.OverlaySettingsStorage ovlsettings = new Window1.OverlaySettingsStorage();
+        public static SettingsWindow.AppSettingsStorage appsettings = new SettingsWindow.AppSettingsStorage();
+        public static SettingsWindow.OverlaySettingsStorage ovlsettings = new SettingsWindow.OverlaySettingsStorage();
         public static BackgroundWorker worker = new BackgroundWorker();
         public static BackgroundWorker workerloader = new BackgroundWorker();
         public static readonly Encoding encoding = Encoding.UTF8;
@@ -1963,7 +1963,7 @@ namespace MTGApro
             {
                 try
                 {
-                    appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Window1.AppSettingsStorage>(RkTokens.GetValue("appsettings").ToString());
+                    appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<SettingsWindow.AppSettingsStorage>(RkTokens.GetValue("appsettings").ToString());
                 }
                 catch (Exception ee)
                 {
@@ -1972,7 +1972,7 @@ namespace MTGApro
 
                 try
                 {
-                    ovlsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Window1.OverlaySettingsStorage>(RkTokens.GetValue("ovlsettings").ToString());
+                    ovlsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<SettingsWindow.OverlaySettingsStorage>(RkTokens.GetValue("ovlsettings").ToString());
                 }
                 catch (Exception ee)
                 {
@@ -2473,8 +2473,8 @@ namespace MTGApro
             //throw new ArgumentException("Parameter cannot be null", "original");
             try
             {
-                Window1 win1 = new Window1();
-                win1.Show();
+                SettingsWindow settingsWindow = new SettingsWindow();
+                settingsWindow.Show();
             }
             catch (Exception ee)
             {

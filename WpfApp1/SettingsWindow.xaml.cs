@@ -2,18 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
 namespace MTGApro
 {
 
 
-    public partial class Window1 : Window
+    public partial class SettingsWindow : Window
     {
         public RegistryKey RkApp { get; private set; }
         public static string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"MTGAproTracker");
@@ -73,7 +71,7 @@ namespace MTGApro
             }
         }
 
-        public Window1()
+        public SettingsWindow()
         {
             InitializeComponent();
             RkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);

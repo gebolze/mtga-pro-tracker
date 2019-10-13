@@ -295,7 +295,7 @@ namespace MTGApro
                         TextTrimming = TextTrimming.CharacterEllipsis
                     };
 
-                    if (Window1.ovlsettings.Font == 1)
+                    if (SettingsWindow.ovlsettings.Font == 1)
                     {
                         txt.FontFamily = new FontFamily(@"Segoe UI");
                     }
@@ -606,7 +606,7 @@ namespace MTGApro
                         TextTrimming = TextTrimming.CharacterEllipsis
                     };
 
-                    if (Window1.ovlsettings.Font == 1)
+                    if (SettingsWindow.ovlsettings.Font == 1)
                     {
                         txt.FontFamily = new FontFamily(@"Segoe UI");
                     }
