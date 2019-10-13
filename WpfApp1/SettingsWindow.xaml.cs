@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 
 namespace MTGApro
 {
@@ -389,14 +388,6 @@ namespace MTGApro
                 selectedacc = "0";
             }
 
-        }
-
-
-        //Open link
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
         }
     }
 }
