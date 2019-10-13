@@ -205,6 +205,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DesktopNotificationManagerCompat.cs" />
+    <Compile Include="SingleInstance\ISingleInstanceApp.cs" />
+    <Compile Include="SingleInstance\NativeMethods.cs" />
+    <Compile Include="SingleInstance\WM.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -235,7 +238,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SingleInstance.cs" />
+    <Compile Include="SingleInstance\SingleInstance.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
