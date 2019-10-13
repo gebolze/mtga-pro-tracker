@@ -27,7 +27,7 @@ namespace MTGApro
     public partial class MatchOverlayWindow : Window
     {
 
-        private Window5 win5 = new Window5();
+        private CardRenderWindow cardRenderWindow = new CardRenderWindow();
 
         public static bool windowhidden = false;
         public static string deckplaying;
@@ -148,9 +148,9 @@ namespace MTGApro
                         if (!string.IsNullOrWhiteSpace(size)) ScaleValue = Convert.ToDouble(op);
                         if (!string.IsNullOrWhiteSpace(posX)) Left = Convert.ToDouble(posX);
                         if (!string.IsNullOrWhiteSpace(posY)) Top = Convert.ToDouble(posY);
-                        win5.Opacity = Opacity;
-                        win5.ApplicationScaleTransform.ScaleX = ScaleValue;
-                        win5.ApplicationScaleTransform.ScaleY = ScaleValue;
+                        cardRenderWindow.Opacity = Opacity;
+                        cardRenderWindow.ApplicationScaleTransform.ScaleX = ScaleValue;
+                        cardRenderWindow.ApplicationScaleTransform.ScaleY = ScaleValue;
                         rendering = false;
                     }
                     catch (Exception e)
@@ -1099,7 +1099,7 @@ namespace MTGApro
 
         private void Mouse_offcard(object sender, MouseEventArgs e)
         {
-            win5.Hide();
+            cardRenderWindow.Hide();
         }
 
         //Display card on hover
@@ -1160,9 +1160,9 @@ namespace MTGApro
                 MyWebClient_DownloadCardCompleted(null, null);
             }
 
-            win5.Left = targetPoints.X;
-            win5.Top = targetPoints.Y - (((targetPoints.Y + win5.ActualHeight * ScaleValue) > winbottom && (targetPoints.Y - (win5.ActualHeight * ScaleValue)) > ourwindow_target.Y) ? (win5.ActualHeight * ScaleValue) : 0);
-            if (!win5.IsVisible) win5.Show();
+            cardRenderWindow.Left = targetPoints.X;
+            cardRenderWindow.Top = targetPoints.Y - (((targetPoints.Y + cardRenderWindow.ActualHeight * ScaleValue) > winbottom && (targetPoints.Y - (cardRenderWindow.ActualHeight * ScaleValue)) > ourwindow_target.Y) ? (cardRenderWindow.ActualHeight * ScaleValue) : 0);
+            if (!cardRenderWindow.IsVisible) cardRenderWindow.Show();
 
             // Close();
         }
@@ -1183,7 +1183,7 @@ namespace MTGApro
                 {
                     ImageSource = src,
                 };
-                win5.cardrenderer.Fill = imageBrush;
+                cardRenderWindow.cardrenderer.Fill = imageBrush;
             }
             catch (Exception ee)
             {
@@ -1250,8 +1250,8 @@ namespace MTGApro
         {
             double cursv = ScaleValue;
             ScaleValue = (double)OnCoerceScaleValue(OverlayWindow, cursv - 0.05);
-            win5.ApplicationScaleTransform.ScaleX = ScaleValue;
-            win5.ApplicationScaleTransform.ScaleY = ScaleValue;
+            cardRenderWindow.ApplicationScaleTransform.ScaleX = ScaleValue;
+            cardRenderWindow.ApplicationScaleTransform.ScaleY = ScaleValue;
             SetOverlayData();
         }
 
@@ -1259,8 +1259,8 @@ namespace MTGApro
         {
             double cursv = ScaleValue;
             ScaleValue = (double)OnCoerceScaleValue(OverlayWindow, cursv + 0.05);
-            win5.ApplicationScaleTransform.ScaleX = ScaleValue;
-            win5.ApplicationScaleTransform.ScaleY = ScaleValue;
+            cardRenderWindow.ApplicationScaleTransform.ScaleX = ScaleValue;
+            cardRenderWindow.ApplicationScaleTransform.ScaleY = ScaleValue;
             SetOverlayData();
         }
 
@@ -1269,7 +1269,7 @@ namespace MTGApro
             double opa = (Opacity - 0.05);
             if (opa < 0.3) opa = 0.3;
             Opacity = opa;
-            win5.Opacity = Opacity;
+            cardRenderWindow.Opacity = Opacity;
             SetOverlayData();
         }
 
@@ -1278,7 +1278,7 @@ namespace MTGApro
             double opa = Opacity + 0.05;
             if (opa > 1) opa = 1;
             Opacity = opa;
-            win5.Opacity = Opacity;
+            cardRenderWindow.Opacity = Opacity;
             SetOverlayData();
         }
 

@@ -6,11 +6,11 @@ using System.Windows.Resources;
 namespace MTGApro
 {
     /// <summary>
-    /// Логика взаимодействия для Window5.xaml
+    /// Логика взаимодействия для CardRenderWindow.xaml
     /// </summary>
-    public partial class Window5 : Window
+    public partial class CardRenderWindow : Window
     {
-        public Window5()
+        public CardRenderWindow()
         {
             InitializeComponent();  
             StreamResourceInfo sriCurs = Application.GetResourceStream(

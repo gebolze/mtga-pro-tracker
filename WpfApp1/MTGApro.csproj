@@ -223,8 +223,8 @@
     <Compile Include="MatchOverlayWindow.xaml.cs">
       <DependentUpon>MatchOverlayWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Window5.xaml.cs">
-      <DependentUpon>Window5.xaml</DependentUpon>
+    <Compile Include="CardRenderWindow.xaml.cs">
+      <DependentUpon>CardRenderWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -263,7 +263,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Window5.xaml">
+    <Page Include="CardRenderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
