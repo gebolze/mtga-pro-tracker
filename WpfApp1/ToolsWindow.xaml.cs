@@ -6,11 +6,11 @@ using System.Windows.Controls;
 namespace MTGApro
 {
     /// <summary>
-    /// Логика взаимодействия для Window2.xaml
+    /// Логика взаимодействия для ToolsWindow.xaml
     /// </summary>
-    public partial class Window2 : Window
+    public partial class ToolsWindow : Window
     {
-        public Window2()
+        public ToolsWindow()
         {
             InitializeComponent();
         }

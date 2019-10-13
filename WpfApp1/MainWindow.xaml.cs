@@ -2531,8 +2531,8 @@ namespace MTGApro
         {
             try
             {
-                Window2 win2 = new Window2();
-                win2.Show();
+                ToolsWindow toolsWindow = new ToolsWindow();
+                toolsWindow.Show();
             }
             catch (Exception ee)
             {
