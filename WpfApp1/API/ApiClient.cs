@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using MTGApro.API.Models;
 
@@ -73,6 +75,52 @@ namespace MTGApro.API
 
                 }
             }
+        }
+
+        public static Dictionary<string, string> VerifyFileChecksum(string token, string filename)
+        {
+            var result = new Dictionary<string, string>();
+
+            try
+            {
+                string checksum = CalculateChecksum(filename);
+
+                var response = ApiClient.MakeRequest(
+                    new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"),
+                    new Dictionary<string, object>
+                    {
+                        {@"checkmd5", checksum}
+                    }, token);
+
+                result.Add("result", response);
+                result.Add("file", filename);
+                result.Add("md5", checksum);
+            }
+            catch
+            {
+                // no nothing
+            }
+
+            return result;
+        }
+
+        public static void UploadCardData(string token, string cardDataChecksum, string cardDataFile, string cardLocalizationFile)
+        {
+            var request = new Dictionary<string, object>();
+            request.Add("md5", cardDataChecksum);
+            request.Add("cards", CompressFile(cardDataFile));
+            request.Add("loc", CompressFile(cardLocalizationFile));
+
+            MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), request, token);
+        }
+
+        public static void UploadEventData(string token, string checksum, string eventLocalizationFile)
+        {
+            var request = new Dictionary<string, object>();
+            request.Add("md5", checksum);
+            request.Add("loc", CompressFile(eventLocalizationFile));
+
+            MakeRequest(new Uri(@"https://mtgarena.pro/mtg/mtgalocloader.php"), request, token);
         }
 
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
@@ -193,6 +241,33 @@ namespace MTGApro.API
             {
                 ErrorReport(ee, token, 539);
                 return null;
+            }
+        }
+
+        private static string CalculateChecksum(string filename)
+        {
+            using (var file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 32768))
+            using (var hasher = new MD5CryptoServiceProvider())
+            {
+                byte[] hash = hasher.ComputeHash(file);
+
+                StringBuilder result = new StringBuilder(hash.Length * 2);
+                for (int i = 0; i < hash.Length; i++)
+                    result.Append(hash[i].ToString("x2"));
+
+                return result.ToString();
+            }
+        }
+
+        private static byte[] CompressFile(string filename)
+        {
+            using (var inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var outputStream = new MemoryStream())
+            using (var compressionStream = new GZipStream(outputStream, CompressionMode.Compress))
+            {
+                inputStream.CopyTo(compressionStream);
+                compressionStream.Flush();
+                return outputStream.ToArray();
             }
         }
     }

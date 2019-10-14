@@ -395,29 +395,13 @@ namespace MTGApro
 
         public static Dictionary<string,string> checkmd5(string dir, string pattern)
         {
-            string[] files = Directory.GetFiles(dir, pattern);
-            Dictionary<string, string> output=new Dictionary<string, string>();
-            try
-            {
-                using (FileStream cardstream = new FileStream(files[0], FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 32768))
-                {
-                    MD5CryptoServiceProvider hasher = new MD5CryptoServiceProvider();
-                    byte[] hash = hasher.ComputeHash(cardstream);
-                    StringBuilder result = new StringBuilder(hash.Length * 2);
-                    for (int i = 0; i < hash.Length; i++)
-                        result.Append(hash[i].ToString("x2"));
-                    string md5 = result.ToString();
-                    output.Add(@"result", ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), new Dictionary<string, object> { { @"checkmd5", md5 } }, Usertoken));
-                    output.Add(@"file", files[0]);
-                    output.Add(@"md5", md5);
-                    cardstream.Close();
-                    cardstream.Dispose();
-                }
-            }
-            catch (Exception)
-            {
 
-            }
+            string[] files = Directory.GetFiles(dir, pattern);
+            Dictionary<string, string> output = new Dictionary<string, string>();
+
+            if (files.Length > 0)
+                output = ApiClient.VerifyFileChecksum(Usertoken, files[0]);
+
             return output;
         }
 
@@ -2088,8 +2072,7 @@ namespace MTGApro
             }
         }
 
-        //Loading initial data on startup
-
+        // Loading initial data on startup
         private void Workerloader_DoWork(object sender, DoWorkEventArgs e)
         {
             TimeZone localZone = TimeZone.CurrentTimeZone;
@@ -2104,12 +2087,8 @@ namespace MTGApro
                 {
                     try
                     {
-                        Dictionary<string, object> cardsDataReq = new Dictionary<string, object> { { @"md5", checkcardsmd5[@"md5"] }, { @"cards", Zip(File.ReadAllText(checkcardsmd5[@"file"])) } };
-                        string[] files = Directory.GetFiles(@"C:\Program Files (x86)\Wizards of the Coast\MTGA\MTGA_Data\Downloads\Data", "data_loc_*");
-                        cardsDataReq.Add(@"loc", Zip(File.ReadAllText(files[0])));
-                        string response = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), cardsDataReq, Usertoken);
-                        cardsDataReq.Clear();
-                        cardsDataReq = default(Dictionary<string, object>);
+                        string[] cardLocalizationFiles = Directory.GetFiles(@"C:\Program Files (x86)\Wizards of the Coast\MTGA\MTGA_Data\Downloads\Data", "data_loc_*");
+                        ApiClient.UploadCardData(Usertoken, checkcardsmd5["md5"], checkcardsmd5["file"], cardLocalizationFiles[0]);
                     }
                     catch (Exception ee)
                     {
@@ -2123,10 +2102,7 @@ namespace MTGApro
                 {
                     try
                     {
-                        Dictionary<string, object> cardsDataReq = new Dictionary<string, object> { { @"md5", checklocmd5[@"md5"] }, { @"loc", Zip(File.ReadAllText(checklocmd5[@"file"])) } };
-                        string response = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/mtgalocloader.php"), cardsDataReq, Usertoken);
-                        cardsDataReq.Clear();
-                        cardsDataReq = default(Dictionary<string, object>);
+                        ApiClient.UploadEventData(Usertoken, checklocmd5["md5"], checklocmd5["file"]);
                     }
                     catch (Exception ee)
                     {
