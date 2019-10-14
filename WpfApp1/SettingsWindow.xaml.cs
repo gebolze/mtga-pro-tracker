@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using MTGApro.API;
 using MTGApro.Models;
 
 namespace MTGApro
@@ -266,7 +267,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                MainWindow.ErrReport(ee);
+                ApiClient.ErrorReport(ee, MainWindow.Usertoken);
             }
         }
 

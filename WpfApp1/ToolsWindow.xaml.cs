@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using MTGApro.API;
 
 namespace MTGApro
 {
@@ -48,7 +49,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                MainWindow.ErrReport(ee);
+                ApiClient.ErrorReport(ee, MainWindow.Usertoken);
             }
         }
     }

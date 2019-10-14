@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
+using MTGApro.API;
 
 namespace MTGApro
 {
@@ -27,7 +28,7 @@ namespace MTGApro
 
         public NotificationsWindow()
         {
-            string notif = MainWindow.MakeRequest(new Uri(@"https://remote.mtgarena.pro/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getpush" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } });
+            string notif = ApiClient.MakeRequest(new Uri(@"https://remote.mtgarena.pro/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getpush" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
             Notifi[] notifparsed = Newtonsoft.Json.JsonConvert.DeserializeObject<Notifi[]>(notif);
             string output = @"";
             for (int i = 0; i <= (notifparsed.Length - 1); i++)

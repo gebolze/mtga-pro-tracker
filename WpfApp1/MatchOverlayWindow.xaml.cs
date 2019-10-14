@@ -18,6 +18,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Resources;
+using MTGApro.API;
 
 namespace MTGApro
 {
@@ -156,7 +157,7 @@ namespace MTGApro
                     catch (Exception e)
                     {
                         string report = e.TargetSite + "//" + e.Message + "//" + e.InnerException + "//" + e.Source + "//" + e.StackTrace + "///" + Environment.OSVersion.Version.Major + "///" + Environment.OSVersion.Version.Minor;
-                        string responseString = MainWindow.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_errreport" }, { @"token", MainWindow.Usertoken }, { @"cm_errreport", report } });
+                        string responseString = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_errreport" }, { @"token", MainWindow.Usertoken }, { @"cm_errreport", report } }, MainWindow.Usertoken);
                     }
 
                     RkApp.Close();
@@ -164,7 +165,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                MainWindow.ErrReport(ee, 40167);
+                ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40167);
             }
         }
 
@@ -194,7 +195,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                MainWindow.ErrReport(ee, 40197);
+                ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40197);
             }
         }
 
@@ -207,7 +208,7 @@ namespace MTGApro
             {
                 try
                 {
-                    string cards_db = MainWindow.MakeRequest(new Uri(@"https://mtgarena.pro/wp-content/plugins/mtgarenapro/js/cards_db_app.js"), new Dictionary<string, object> { }, "GET");
+                    string cards_db = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/wp-content/plugins/mtgarenapro/js/cards_db_app.js"), new Dictionary<string, object> { }, MainWindow.Usertoken, "GET");
                     cdb = JsonConvert.DeserializeObject<Dictionary<int, Card>>(cards_db);
                     foreach (KeyValuePair<int, Card> cid in cdb)
                     {
@@ -233,7 +234,7 @@ namespace MTGApro
                     {
 
                     }
-                    MainWindow.ErrReport(ee, 40224);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40224);
                 }
             }
         }
@@ -251,7 +252,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                MainWindow.ErrReport(ee, 40254);
+                ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40254);
             }
 
 
@@ -552,7 +553,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    MainWindow.ErrReport(ee, 40564);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40564);
                 }
             }
         }
@@ -715,7 +716,7 @@ namespace MTGApro
                 }
                 catch(Exception ee)
                 {
-                    MainWindow.ErrReport(ee, 40723);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40723);
                 }
 
             }
@@ -758,7 +759,7 @@ namespace MTGApro
             {
                 try
                 {
-                    string curdrft = MainWindow.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivedraft" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken }, { @"cardsquery", JsonConvert.SerializeObject(MainWindow.TheMatch.Draftdeck) } });
+                    string curdrft = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivedraft" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken }, { @"cardsquery", JsonConvert.SerializeObject(MainWindow.TheMatch.Draftdeck) } }, MainWindow.Usertoken);
                     if (curdrft != @"ERRCONN")
                     {
                         Dictionary<string, Dictionary<int, int>> curdrftparsed = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<int, int>>>(curdrft);
@@ -778,7 +779,7 @@ namespace MTGApro
                         }
                         catch (Exception ee)
                         {
-                            MainWindow.ErrReport(ee, 764);
+                            ApiClient.ErrorReport(ee, MainWindow.Usertoken, 764);
                         }
 
                         melabel.Text = @"Pick: " + (PickMacking + 1).ToString();
@@ -789,7 +790,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    MainWindow.ErrReport(ee, 40774);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40774);
                 }
             }
             //Handling fight
@@ -797,7 +798,7 @@ namespace MTGApro
             {
                 try
                 {
-                    string curbtl = MainWindow.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivematch" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } });
+                    string curbtl = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivematch" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
                     if (curbtl != @"ERRCONN")
                     {
                         Battle curbtlparsed = JsonConvert.DeserializeObject<Battle>(curbtl);
@@ -834,7 +835,7 @@ namespace MTGApro
                                 }
                                 catch (Exception ee)
                                 {
-                                    MainWindow.ErrReport(ee, 40788);
+                                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40788);
                                 }
                             }
                             else
@@ -955,7 +956,7 @@ namespace MTGApro
                                 }
                                 catch (Exception ee)
                                 {
-                                    MainWindow.ErrReport(ee, 40909);
+                                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40909);
                                 }
                                 setmode = "opponent";
                             }
@@ -974,7 +975,7 @@ namespace MTGApro
                                             }
                                             catch (Exception ee)
                                             {
-                                                MainWindow.ErrReport(ee, 40928);
+                                                ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40928);
                                             }
                                             highlight = ucard.Key;
                                         }
@@ -1024,7 +1025,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    MainWindow.ErrReport(ee, 1010);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 1010);
                 }
             }
             else
@@ -1032,7 +1033,7 @@ namespace MTGApro
                 //Handling decks list rendering
                 try
                 {
-                    string decks = MainWindow.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getuserdecks" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } });
+                    string decks = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getuserdecks" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
                     if (decks != @"ERRCONN")
                     {
                         Deck[] decksparsed = JsonConvert.DeserializeObject<Deck[]>(decks);
@@ -1048,7 +1049,7 @@ namespace MTGApro
                             }
                             catch (Exception ee)
                             {
-                                MainWindow.ErrReport(ee, 40995);
+                                ApiClient.ErrorReport(ee, MainWindow.Usertoken, 40995);
                             }
                             decksrendered = true;
                         }
@@ -1058,7 +1059,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    MainWindow.ErrReport(ee, 1044);
+                    ApiClient.ErrorReport(ee, MainWindow.Usertoken, 1044);
                 }
             }
         }
@@ -1136,7 +1137,7 @@ namespace MTGApro
                     }
                     catch (Exception ee)
                     {
-                        MainWindow.ErrReport(ee, 401130);
+                        ApiClient.ErrorReport(ee, MainWindow.Usertoken, 401130);
                     }
                 }
             }
@@ -1151,7 +1152,7 @@ namespace MTGApro
                     }
                     catch (Exception ee)
                     {
-                        MainWindow.ErrReport(ee, 401145);
+                        ApiClient.ErrorReport(ee, MainWindow.Usertoken, 401145);
                     }
                 }
             }
@@ -1380,7 +1381,7 @@ namespace MTGApro
                         }
                         catch (Exception ee)
                         {
-                            MainWindow.ErrReport(ee, 401313);
+                            ApiClient.ErrorReport(ee, MainWindow.Usertoken, 401313);
                         }
                     }
                     Thread.Sleep(500);

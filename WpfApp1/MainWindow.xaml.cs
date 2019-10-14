@@ -23,6 +23,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using MTGApro.API;
+using MTGApro.API.Models;
 using MTGApro.Models;
 
 //using Windows.Data.Xml.Dom;
@@ -240,24 +242,6 @@ namespace MTGApro
             }
         }
 
-        public class Response
-        {
-            public string Status { get; set; }
-            public string Data { get; set; }
-            public int Chunk { get; set; }
-            public int Timer { get; set; }
-            public string Package { get; set; }
-
-            public Response(string status, string data, int chunk = 50, int timer = 0, string package = @"")
-            {
-                Status = status;
-                Data = data;
-                Chunk = chunk;
-                Timer = timer;
-                Package = package;
-            }
-        }
-
         public static DateTime tmstmptodate(double stamp)
         {
             DateTime dateTime = new DateTime(1970, 1, 1);
@@ -357,7 +341,7 @@ namespace MTGApro
                     }
                     catch (Exception ee)
                     {
-                        ErrReport(ee, 353);
+                        ApiClient.ErrorReport(ee, Usertoken, 353);
                     }
 
                     RkApp.Close();
@@ -365,7 +349,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 361);
+                ApiClient.ErrorReport(ee, Usertoken, 361);
             }
         }
 
@@ -399,68 +383,14 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee, 395);
+                    ApiClient.ErrorReport(ee, Usertoken, 395);
                 }
                 RkApp.Close();
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 401);
+                ApiClient.ErrorReport(ee, Usertoken, 401);
             }
-        }
-
-        //Better error reporter
-
-        public static void ErrReport(Exception e, int linemanual = 0)
-        {
-            StackTrace st = new StackTrace(e, true);
-            StackFrame frame = st.GetFrame(st.FrameCount - 1);
-            int line = frame.GetFileLineNumber();
-            int col = frame.GetFileColumnNumber();
-            string func = frame.GetMethod().Name;
-            string file = frame.GetFileName();
-
-            Dictionary<string, object> report = new Dictionary<string, object> { { @"cmd", @"cm_errreport" }, { @"token", Usertoken }, { @"function", func }, { @"line", line.ToString() }, { @"col", col.ToString() }, { @"file", file }, { @"errmsg", e.Message }, { @"version", version.ToString() }, { @"cm_errreport", "!!!" + linemanual.ToString() + "!!!" + e.Message + "///" + e.InnerException + "///" + e.Source + "///" + e.StackTrace + "///" + e.TargetSite + "///" + Environment.OSVersion.Version.Major + "///" + Environment.OSVersion.Version.Minor + "///" + e.ToString() } };
-            string responseString = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), report);
-            if (responseString == "ERRCONN")
-            {
-                try
-                {
-                    File.AppendAllText(@"upload_err_log.txt", Newtonsoft.Json.JsonConvert.SerializeObject(report));
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-            else
-            {
-                try
-                {
-                    Response info = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(responseString);
-                    if (info.Status != @"ok")
-                    {
-                        try
-                        {
-                            File.AppendAllText(@"upload_err_log.txt", Newtonsoft.Json.JsonConvert.SerializeObject(report));
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-        }
-
-        //remote server request conductor
-        public static bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
         }
 
         public static Dictionary<string,string> checkmd5(string dir, string pattern)
@@ -477,7 +407,7 @@ namespace MTGApro
                     for (int i = 0; i < hash.Length; i++)
                         result.Append(hash[i].ToString("x2"));
                     string md5 = result.ToString();
-                    output.Add(@"result", MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), new Dictionary<string, object> { { @"checkmd5", md5 } }));
+                    output.Add(@"result", ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), new Dictionary<string, object> { { @"checkmd5", md5 } }, Usertoken));
                     output.Add(@"file", files[0]);
                     output.Add(@"md5", md5);
                     cardstream.Close();
@@ -490,115 +420,6 @@ namespace MTGApro
             }
             return output;
         }
-
-        public static string MakeRequest(Uri uri, Dictionary<string, object> data, string method = "POST")
-        {
-            try
-            {
-                string formDataBoundary = string.Format("----------{0:N}", Guid.NewGuid());
-                string contentType = "multipart/form-data; boundary=" + formDataBoundary;
-
-                byte[] formData = WriteMultipartForm(data, formDataBoundary);
-                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(uri);
-                httpWebRequest.Method = method;
-
-                if (method == "POST")
-                {
-                    httpWebRequest.ContentType = "multipart/form-data; boundary=" + formDataBoundary;
-                    httpWebRequest.ContentLength = formData.Length;
-
-                    using (Stream requestStream = httpWebRequest.GetRequestStream())
-                    {
-                        requestStream.Write(formData, 0, formData.Length);
-                        requestStream.Close();
-                    }
-                }
-                HttpWebResponse response = (HttpWebResponse)httpWebRequest.GetResponse();
-                string responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                response.Close();
-                return responseString;
-            }
-            catch (Exception e)
-            {
-                try
-                {
-                    StackTrace st = new StackTrace(e, true);
-                    StackFrame frame = st.GetFrame(st.FrameCount - 1);
-                    int line = frame.GetFileLineNumber();
-                    int col = frame.GetFileColumnNumber();
-                    string func = frame.GetMethod().Name;
-                    string file = frame.GetFileName();
-
-                    Dictionary<string, object> report = new Dictionary<string, object> { { @"cmd", @"cm_errreport" }, { @"token", Usertoken }, { @"function", func }, { @"line", line.ToString() }, { @"col", col.ToString() }, { @"file", file }, { @"errmsg", e.Message }, { @"version", version.ToString() }, { @"cm_errreport", "!!!" + e.Message + "///" + e.InnerException + "///" + e.Source + "///" + e.StackTrace + "///" + e.TargetSite + "///" + Environment.OSVersion.Version.Major + "///" + Environment.OSVersion.Version.Minor + "///" + e.ToString() } };
-                    File.AppendAllText(@"network_err_log.txt", Newtonsoft.Json.JsonConvert.SerializeObject(report));
-                }
-                catch (Exception)
-                {
-
-                }
-                return "ERRCONN";
-            }
-        }
-
-
-        public static byte[] WriteMultipartForm(Dictionary<string, object> postParameters, string boundary)
-        {
-            try
-            {
-                Stream formDataStream = new MemoryStream();
-                bool needsCLRF = false;
-
-                foreach (KeyValuePair<string, object> param in postParameters)
-                {
-                    // Thanks to feedback from commenters, add a CRLF to allow multiple parameters to be added.
-                    // Skip it on the first parameter, add it to subsequent parameters.
-                    if (needsCLRF)
-                        formDataStream.Write(encoding.GetBytes("\r\n"), 0, encoding.GetByteCount("\r\n"));
-
-                    needsCLRF = true;
-
-                    if (param.Value is string)
-                    {
-                        string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}", boundary, param.Key, param.Value);
-                        formDataStream.Write(encoding.GetBytes(postData), 0, encoding.GetByteCount(postData));
-                    }
-                    else if (param.Value is byte[])
-                    {
-                        byte[] writezip = (byte[])param.Value;
-                        string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: {3}\r\n\r\n",
-                        boundary,
-                        param.Key,
-                        param.Key,
-                        "application/octet-stream");
-
-                        formDataStream.Write(encoding.GetBytes(header), 0, encoding.GetByteCount(header));
-
-                        // Write the file data directly to the Stream, rather than serializing it to a string.
-                        formDataStream.Write(writezip, 0, writezip.Length);
-                    }
-                }
-
-                // Add the end of the request.  Start with a newline
-                string footer = "\r\n--" + boundary + "--\r\n";
-                formDataStream.Write(encoding.GetBytes(footer), 0, encoding.GetByteCount(footer));
-
-                // Dump the Stream into a byte[]
-                formDataStream.Position = 0;
-                byte[] formData = new byte[formDataStream.Length];
-                formDataStream.Read(formData, 0, formData.Length);
-                formDataStream.Close();
-
-                return formData;
-            }
-            catch (Exception ee)
-            {
-                ErrReport(ee, 539);
-                return null;
-            }
-        }
-
-
 
         public static string GenPath(bool dir)
         {
@@ -658,7 +479,7 @@ namespace MTGApro
                     }
                     catch (Exception ee)
                     {
-                        ErrReport(ee, 607);
+                        ApiClient.ErrorReport(ee, Usertoken, 607);
                     }
 
                     //loglen = 0;
@@ -840,7 +661,7 @@ namespace MTGApro
                                                 catch (Exception ee)
                                                 {
                                                     Showmsg(Colors.Red, @"Error reading log!  (802)", @"CLR", false, @"attention");
-                                                    ErrReport(ee, 775);
+                                                    ApiClient.ErrorReport(ee, Usertoken, 775);
                                                 }
 
                                                 double tst = ConvertToUnixTimestamp(d);
@@ -860,7 +681,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
                                             Showmsg(Colors.Red, @"Error reading log!  (821)", @"CLR", false, @"attention");
-                                            ErrReport(ee, 793);
+                                            ApiClient.ErrorReport(ee, Usertoken, 793);
                                         }
 
                                         if (!matchline)
@@ -1193,7 +1014,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
                                             Showmsg(Colors.Red, @"Error reading log! (1084)", @"CLR", false, @"attention");
-                                            ErrReport(ee, 962);
+                                            ApiClient.ErrorReport(ee, Usertoken, 962);
 
                                         }
                                     }
@@ -1215,7 +1036,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
                                             Showmsg(Colors.Red, @"Error reading log! (1106)", @"CLR", false, @"attention");
-                                            ErrReport(ee, 983);
+                                            ApiClient.ErrorReport(ee, Usertoken, 983);
 
                                         }
                                     }
@@ -1249,7 +1070,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
                                             Showmsg(Colors.Red, @"Error reading log! (1140)", @"CLR", false, @"attention");
-                                            ErrReport(ee, 1016);
+                                            ApiClient.ErrorReport(ee, Usertoken, 1016);
 
                                         }
                                     }
@@ -1302,7 +1123,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
                                             //Showmsg(Colors.Red, @"Error reading log!", @"CLR", false, @"attention");
-                                            ErrReport(ee, 1068);
+                                            ApiClient.ErrorReport(ee, Usertoken, 1068);
                                         }
                                     }
                                     else if ((index == 7 || index == 9) && parsed[output.Key][index] != @"")
@@ -1335,7 +1156,7 @@ namespace MTGApro
                                             catch (Exception ee)
                                             {
                                                 // Showmsg(Colors.Red, @"Error reading log!", @"CLR", false, @"attention");
-                                                ErrReport(ee, 1176);
+                                                ApiClient.ErrorReport(ee, Usertoken, 1176);
                                             }
                                             TheMatch.Hasnewdata = true;
                                             if (TheMatch.DraftPack == 2 && TheMatch.DraftPick == 14)
@@ -1350,7 +1171,7 @@ namespace MTGApro
                                         catch (Exception ee)
                                         {
 
-                                            ErrReport(ee, 1109);
+                                            ApiClient.ErrorReport(ee, Usertoken, 1109);
                                             TheMatch.Hasnewdata = true;
                                             TheMatch.IsDrafting = false;
                                         }
@@ -1409,7 +1230,7 @@ namespace MTGApro
             catch (Exception ee)
             {
                 Showmsg(Colors.Red, @"Error reading log! (1300)", @"CLR", false, @"attention");
-                ErrReport(ee, 1167);
+                ApiClient.ErrorReport(ee, Usertoken, 1167);
             }
         }
 
@@ -1477,7 +1298,7 @@ namespace MTGApro
                 return true;
             }
 
-            string upload = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), requestdict);
+            string upload = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), requestdict, Usertoken);
             if (upload == "ERRCONN")
             {
                 return false;
@@ -1547,7 +1368,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee, 1293);
+                    ApiClient.ErrorReport(ee, Usertoken, 1293);
                     return false;
                 }
             }
@@ -1559,9 +1380,9 @@ namespace MTGApro
         {
             try
             {
-                string indic = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getindicators" }, { @"cm_init", version.ToString() } });
-                string datef = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdateformats" } });
-                string daterepl = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdatereplacements" } });
+                string indic = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getindicators" }, { @"cm_init", version.ToString() } }, Usertoken);
+                string datef = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdateformats" } }, Usertoken);
+                string daterepl = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdatereplacements" } }, Usertoken);
                 if (indic != @"ERRCONN")
                 {
                     indicators = Newtonsoft.Json.JsonConvert.DeserializeObject<Parser[]>(indic);
@@ -1576,7 +1397,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 1322);
+                ApiClient.ErrorReport(ee, Usertoken, 1322);
             }
         }
 
@@ -1586,7 +1407,7 @@ namespace MTGApro
         {
             try
             {
-                string checkver = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_init" }, { @"cm_init", version.ToString() } });
+                string checkver = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_init" }, { @"cm_init", version.ToString() } }, Usertoken);
 
                 if (checkver != @"ERRCONN")
                 {
@@ -1621,7 +1442,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 1367);
+                ApiClient.ErrorReport(ee, Usertoken, 1367);
             }
         }
 
@@ -1848,7 +1669,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 1566);
+                ApiClient.ErrorReport(ee, Usertoken, 1566);
             }
         }
 
@@ -1955,7 +1776,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee);
+                    Client.ErrorReport(ee, Usertoken);
                 }
             }*/
 
@@ -1969,7 +1790,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee, 1687);
+                    ApiClient.ErrorReport(ee, Usertoken, 1687);
                 }
 
                 try
@@ -1978,7 +1799,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee, 1696);
+                    ApiClient.ErrorReport(ee, Usertoken, 1696);
                 }
             }
 
@@ -2149,7 +1970,7 @@ namespace MTGApro
                                     }
                                     catch (Exception ee)
                                     {
-                                        ErrReport(ee, 1864);
+                                        ApiClient.ErrorReport(ee, Usertoken, 1864);
                                     }
                                 }));
                             }
@@ -2166,7 +1987,7 @@ namespace MTGApro
                                     }
                                     catch (Exception ee)
                                     {
-                                        ErrReport(ee, 1881);
+                                        ApiClient.ErrorReport(ee, Usertoken, 1881);
                                     }
                                 }));
                             }
@@ -2207,7 +2028,7 @@ namespace MTGApro
                             }
                             catch (Exception ee)
                             {
-                                ErrReport(ee, 1922);
+                                ApiClient.ErrorReport(ee, Usertoken, 1922);
                             }
                             if (appsettings != null)
                             {
@@ -2233,7 +2054,7 @@ namespace MTGApro
                     }
                     catch (Exception ee)
                     {
-                        ErrReport(ee, 1949);
+                        ApiClient.ErrorReport(ee, Usertoken, 1949);
                     }
                     //Thread.Sleep(upltimers[appsettings.Upl]);
 
@@ -2286,7 +2107,7 @@ namespace MTGApro
                         Dictionary<string, object> cardsDataReq = new Dictionary<string, object> { { @"md5", checkcardsmd5[@"md5"] }, { @"cards", Zip(File.ReadAllText(checkcardsmd5[@"file"])) } };
                         string[] files = Directory.GetFiles(@"C:\Program Files (x86)\Wizards of the Coast\MTGA\MTGA_Data\Downloads\Data", "data_loc_*");
                         cardsDataReq.Add(@"loc", Zip(File.ReadAllText(files[0])));
-                        string response = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), cardsDataReq);
+                        string response = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/uploadcards.php"), cardsDataReq, Usertoken);
                         cardsDataReq.Clear();
                         cardsDataReq = default(Dictionary<string, object>);
                     }
@@ -2303,7 +2124,7 @@ namespace MTGApro
                     try
                     {
                         Dictionary<string, object> cardsDataReq = new Dictionary<string, object> { { @"md5", checklocmd5[@"md5"] }, { @"loc", Zip(File.ReadAllText(checklocmd5[@"file"])) } };
-                        string response = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/mtgalocloader.php"), cardsDataReq);
+                        string response = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/mtgalocloader.php"), cardsDataReq, Usertoken);
                         cardsDataReq.Clear();
                         cardsDataReq = default(Dictionary<string, object>);
                     }
@@ -2318,7 +2139,7 @@ namespace MTGApro
 
             }
 
-            string responseString = MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_userbytokenid" }, { @"cm_userbytokenid", tokeninput }, { @"version", version.ToString() }, { @"usertime", currentOffset } });
+            string responseString = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_userbytokenid" }, { @"cm_userbytokenid", tokeninput }, { @"version", version.ToString() }, { @"usertime", currentOffset } }, Usertoken);
             if (responseString != @"ERRCONN")
             {
                 Response info = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(responseString);
@@ -2355,7 +2176,7 @@ namespace MTGApro
                             }
                             catch (Exception ee)
                             {
-                                ErrReport(ee, 2027);
+                                ApiClient.ErrorReport(ee, Usertoken, 2027);
                             }
                             Registry.CurrentUser.DeleteSubKey(@"SOFTWARE\\MTGAProtracker");
                             ni.Visible = false;
@@ -2365,7 +2186,7 @@ namespace MTGApro
                         }
                         catch (Exception ee)
                         {
-                            ErrReport(ee, 2037);
+                            ApiClient.ErrorReport(ee, Usertoken, 2037);
                             ni.Visible = false;
                             ni.Dispose();
                             Process.Start(Application.ResourceAssembly.Location, "restarting");
@@ -2480,7 +2301,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2149);
+                ApiClient.ErrorReport(ee, Usertoken, 2149);
             }
         }
 
@@ -2501,7 +2322,7 @@ namespace MTGApro
                 }
                 catch (Exception ee)
                 {
-                    ErrReport(ee, 2170);
+                    ApiClient.ErrorReport(ee, Usertoken, 2170);
                 }
                 Registry.CurrentUser.DeleteSubKey(@"SOFTWARE\\MTGAProtracker");
                 ni.Visible = false;
@@ -2525,7 +2346,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2194);
+                ApiClient.ErrorReport(ee, Usertoken, 2194);
             }
         }
 
@@ -2538,7 +2359,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2207);
+                ApiClient.ErrorReport(ee, Usertoken, 2207);
             }
         }
 
@@ -2565,7 +2386,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2234);
+                ApiClient.ErrorReport(ee, Usertoken, 2234);
             }
         }
 
@@ -2591,7 +2412,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2260);
+                ApiClient.ErrorReport(ee, Usertoken, 2260);
 
             }
         }
@@ -2666,7 +2487,7 @@ namespace MTGApro
             }
             catch (Exception ee)
             {
-                ErrReport(ee, 2328);
+                ApiClient.ErrorReport(ee, Usertoken, 2328);
             }
         }
 
@@ -2694,7 +2515,7 @@ namespace MTGApro
         {
             Exception ee = (Exception)args.ExceptionObject;
 
-            ErrReport(ee, -1);
+            ApiClient.ErrorReport(ee, Usertoken, -1);
 
             RegistryKey RkApp = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\\MTGAProtracker", true);
             if (RkApp == null)

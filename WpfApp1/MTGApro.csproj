@@ -204,6 +204,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ApiClient.cs" />
+    <Compile Include="API\Models\Response.cs" />
     <Compile Include="DesktopNotificationManagerCompat.cs" />
     <Compile Include="Models\AppSettingsStorage.cs" />
     <Compile Include="Models\OverlaySettingsStorage.cs" />
