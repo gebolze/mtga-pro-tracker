@@ -23,6 +23,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using MTGApro.Models;
+
 //using Windows.Data.Xml.Dom;
 
 namespace MTGApro
@@ -80,8 +82,8 @@ namespace MTGApro
         // public static Dictionary<double, Curmatchforupload> matchdetails = new Dictionary<double, Curmatchforupload>();
         public static string[] hashes;
         public static double parsedtill = 0;
-        public static SettingsWindow.AppSettingsStorage appsettings = new SettingsWindow.AppSettingsStorage();
-        public static SettingsWindow.OverlaySettingsStorage ovlsettings = new SettingsWindow.OverlaySettingsStorage();
+        public static AppSettingsStorage appsettings = new AppSettingsStorage();
+        public static OverlaySettingsStorage ovlsettings = new OverlaySettingsStorage();
         public static BackgroundWorker worker = new BackgroundWorker();
         public static BackgroundWorker workerloader = new BackgroundWorker();
         public static readonly Encoding encoding = Encoding.UTF8;
@@ -1963,7 +1965,7 @@ namespace MTGApro
             {
                 try
                 {
-                    appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<SettingsWindow.AppSettingsStorage>(RkTokens.GetValue("appsettings").ToString());
+                    appsettings = AppSettingsStorage.Load();
                 }
                 catch (Exception ee)
                 {
@@ -1972,7 +1974,7 @@ namespace MTGApro
 
                 try
                 {
-                    ovlsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<SettingsWindow.OverlaySettingsStorage>(RkTokens.GetValue("ovlsettings").ToString());
+                    ovlsettings = OverlaySettingsStorage.Load();
                 }
                 catch (Exception ee)
                 {

@@ -5,11 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using MTGApro.Models;
 
 namespace MTGApro
 {
-
-
     public partial class SettingsWindow : Window
     {
         public RegistryKey RkApp { get; private set; }
@@ -24,55 +23,10 @@ namespace MTGApro
         public static string filename = @"";
         public static bool dateok = false;
 
-        public class AppSettingsStorage
-        {
-            public bool Minimized { get; set; }
-            public int Upl { get; set; }
-            public int Icon { get; set; }
-            public string Path { get; set; }
-
-            public AppSettingsStorage(bool min = false, int up = 0, int ic = 0, string pa = @"", string df = @"", string df_am = @"", string df_pm = @"")
-            {
-                Minimized = min;
-                Upl = up;
-                Icon = ic;
-                Path = pa;
-            }
-        }
-
-        public class OverlaySettingsStorage
-        {
-            public int Leftdigit { get; set; }
-            public int Rightdigit { get; set; }
-            public int Leftdigitdraft { get; set; }
-            public int Rightdigitdraft { get; set; }
-            public int Font { get; set; }
-            public bool Streamer { get; set; }
-            public bool Decklist { get; set; }
-            public bool Autoswitch { get; set; }
-            public bool Showcard { get; set; }
-            public bool Showtimers { get; set; }
-            public bool Hotkeys { get; set; }
-
-            public OverlaySettingsStorage(int leftdigit = 0, int rightdigit = 2, int leftdigitdraft = 0, int rightdigitdraft = 1, bool streamer = false, bool decklist = true, bool autoswitch = true, bool showcard = true, bool showtimers = true, int font = 0, bool hotkeys = true)
-            {
-                Leftdigit = leftdigit;
-                Rightdigit = rightdigit;
-                Leftdigitdraft = leftdigitdraft;
-                Rightdigitdraft = rightdigitdraft;
-                Streamer = streamer;
-                Decklist = decklist;
-                Autoswitch = autoswitch;
-                Showcard = showcard;
-                Showtimers = showtimers;
-                Font = font;
-                Hotkeys = hotkeys;
-            }
-        }
-
         public SettingsWindow()
         {
             InitializeComponent();
+
             RkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             if (RkApp.GetValue("MTGApro") == null)
             {
@@ -91,16 +45,8 @@ namespace MTGApro
             {
                 try
                 {
-                    appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<AppSettingsStorage>(RkTokens.GetValue("appsettings").ToString());
-                }
-                catch (Exception ee)
-                {
-                    //MainWindow.ErrReport(ee);
-                }
-
-                try
-                {
-                    ovlsettings = Newtonsoft.Json.JsonConvert.DeserializeObject<OverlaySettingsStorage>(RkTokens.GetValue("ovlsettings").ToString());
+                    appsettings = AppSettingsStorage.Load();
+                    ovlsettings = OverlaySettingsStorage.Load();
                 }
                 catch (Exception ee)
                 {
@@ -214,11 +160,7 @@ namespace MTGApro
             appsettings.Icon = Icoselector.SelectedIndex;
             appsettings.Path = filename;
 
-            string output = Newtonsoft.Json.JsonConvert.SerializeObject(appsettings);
-            RegistryKey RkTokens = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\\MTGAProtracker", true);
-            RkTokens.SetValue("appsettings", output);
-
-            //RkTokens.Close();
+            appsettings.Save();
 
             ovlsettings.Leftdigit = DigitsToShow_left.SelectedIndex;
             ovlsettings.Rightdigit = DigitsToShow_right.SelectedIndex;
@@ -280,9 +222,7 @@ namespace MTGApro
                 ovlsettings.Hotkeys = false;
             }
 
-            string outputovl = Newtonsoft.Json.JsonConvert.SerializeObject(ovlsettings);
-            RkTokens.SetValue("ovlsettings", outputovl);
-            RkTokens.Close();
+            ovlsettings.Save();
 
             MainWindow.ni.Visible = false;
             MainWindow.ni.Dispose();
@@ -387,7 +327,6 @@ namespace MTGApro
                 Token_label.Text = @"";
                 selectedacc = "0";
             }
-
         }
     }
 }

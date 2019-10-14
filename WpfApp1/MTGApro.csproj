@@ -205,6 +205,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DesktopNotificationManagerCompat.cs" />
+    <Compile Include="Models\AppSettingsStorage.cs" />
+    <Compile Include="Models\OverlaySettingsStorage.cs" />
     <Compile Include="SingleInstance\ISingleInstanceApp.cs" />
     <Compile Include="SingleInstance\NativeMethods.cs" />
     <Compile Include="SingleInstance\WM.cs" />
