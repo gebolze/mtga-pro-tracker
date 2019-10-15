@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -160,6 +160,52 @@ namespace MTGApro.API
                 throw new ConnectionException();
 
             var result = JsonConvert.DeserializeObject<Response>(response);
+            return result;
+        }
+
+        public static Parser[] GetIndicators(string token, int version)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_getindicators"},
+                    {@"cm_init", version.ToString()}
+                },
+                token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Parser[]>(response);
+            return result;
+        }
+
+        public static string[] GetDateFormats(string token)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_getdateformats"}
+                },
+                token);
+
+            var result = JsonConvert.DeserializeObject<string[]>(response);
+            return result;
+        }
+
+        public static Dictionary<string, string> GetDateReplacements(string token)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_getdatereplacements"}
+                },
+                token);
+
+            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
             return result;
         }
 

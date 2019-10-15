@@ -211,37 +211,6 @@ namespace MTGApro
             }
         }
 
-        public class Parser
-        {
-            public string Indicators { get; set; }
-            public string Loginput { get; set; }
-            public bool Send { get; set; }
-            public bool Needrunning { get; set; }
-            public bool Addup { get; set; }
-            public string Stopper { get; set; }
-            public string Needtohave { get; set; }
-            public string Ignore { get; set; }
-
-            public Parser(string indocators, bool send = true, bool needrunning = false, bool addup = false, string stopper = @"(Filename:", string needtohave = @"", string loginput = @"", string ignore = @"")
-            {
-                Send = send;
-                Indicators = indocators;
-                if (loginput != null)
-                {
-                    Loginput = loginput;
-                }
-                else
-                {
-                    Loginput = @"";
-                }
-                Needrunning = needrunning;
-                Addup = addup;
-                Stopper = stopper;
-                Needtohave = needtohave;
-                Ignore = ignore;
-            }
-        }
-
         public static DateTime tmstmptodate(double stamp)
         {
             DateTime dateTime = new DateTime(1970, 1, 1);
@@ -1364,17 +1333,15 @@ namespace MTGApro
         {
             try
             {
-                string indic = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getindicators" }, { @"cm_init", version.ToString() } }, Usertoken);
-                string datef = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdateformats" } }, Usertoken);
-                string daterepl = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getdatereplacements" } }, Usertoken);
-                if (indic != @"ERRCONN")
+                try
                 {
-                    indicators = Newtonsoft.Json.JsonConvert.DeserializeObject<Parser[]>(indic);
-                    dateformats = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(datef);
-                    datereplacements = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(daterepl);
+                    indicators = ApiClient.GetIndicators(Usertoken, version);
+                    dateformats = ApiClient.GetDateFormats(Usertoken);
+                    datereplacements = ApiClient.GetDateReplacements(Usertoken);
+
                     hashes = new string[indicators.Length];
                 }
-                else
+                catch (ConnectionException)
                 {
                     Showmsg(Colors.Red, @"Unable to establish initial connection", @"CLR", false, @"attention");
                 }

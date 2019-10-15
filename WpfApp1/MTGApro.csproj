@@ -206,6 +206,7 @@
   <ItemGroup>
     <Compile Include="API\ApiClient.cs" />
     <Compile Include="API\Models\Notification.cs" />
+    <Compile Include="API\Models\Parser.cs" />
     <Compile Include="API\Models\Response.cs" />
     <Compile Include="DesktopNotificationManagerCompat.cs" />
     <Compile Include="Models\AppSettingsStorage.cs" />
