@@ -137,7 +137,6 @@ namespace MTGApro
                 RegistryKey RkApp = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\\MTGAProtracker");
                 if (RkApp != null)
                 {
-
                     try
                     {
                         string op = RkApp.GetValue("op").ToString();
@@ -156,8 +155,7 @@ namespace MTGApro
                     }
                     catch (Exception e)
                     {
-                        string report = e.TargetSite + "//" + e.Message + "//" + e.InnerException + "//" + e.Source + "//" + e.StackTrace + "///" + Environment.OSVersion.Version.Major + "///" + Environment.OSVersion.Version.Minor;
-                        string responseString = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_errreport" }, { @"token", MainWindow.Usertoken }, { @"cm_errreport", report } }, MainWindow.Usertoken);
+                        ApiClient.SimpleErrorReport(MainWindow.Usertoken, e);
                     }
 
                     RkApp.Close();

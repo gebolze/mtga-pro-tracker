@@ -85,6 +85,27 @@ namespace MTGApro.API
             }
         }
 
+        public static void SimpleErrorReport(string token, Exception ex)
+        {
+            var report = ex.TargetSite
+                         + "//" + ex.Message
+                         + "//" + ex.InnerException
+                         + "//" + ex.Source
+                         + "//" + ex.StackTrace
+                         + "///" + Environment.OSVersion.Version.Major
+                         + "///" + Environment.OSVersion.Version.Minor;
+
+            MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    { @"cmd", @"cm_errreport" }, 
+                    { @"token", token },
+                    { @"cm_errreport", report }
+                }, 
+                token);
+        }
+
         public static Dictionary<string, string> VerifyFileChecksum(string token, string filename)
         {
             var result = new Dictionary<string, string>();
