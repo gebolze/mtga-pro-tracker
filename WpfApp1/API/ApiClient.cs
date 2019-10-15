@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +11,13 @@ using Newtonsoft.Json;
 
 namespace MTGApro.API
 {
+    public class ConnectionException : Exception
+    {
+        public ConnectionException()
+        {
+        }
+    }
+
     public static class ApiClient
     {
         private static readonly Encoding Encoding = Encoding.UTF8;
@@ -136,6 +143,24 @@ namespace MTGApro.API
 
             var notifications = JsonConvert.DeserializeObject<Notification[]>(response);
             return notifications;
+        }
+
+        public static Response CheckVersion(string token, int version)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_init"},
+                    {@"cm_init", version.ToString()}
+                },
+                token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Response>(response);
+            return result;
         }
 
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")

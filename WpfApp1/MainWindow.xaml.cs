@@ -1391,11 +1391,9 @@ namespace MTGApro
         {
             try
             {
-                string checkver = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_init" }, { @"cm_init", version.ToString() } }, Usertoken);
-
-                if (checkver != @"ERRCONN")
+                try
                 {
-                    Response info = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(checkver);
+                    var info = ApiClient.CheckVersion(Usertoken, version);
                     if (info != null)
                     {
                         Dispatcher.BeginInvoke(new ThreadStart(delegate
@@ -1419,7 +1417,7 @@ namespace MTGApro
                         }
                     }
                 }
-                else
+                catch (ConnectionException)
                 {
                     Showmsg(Colors.Red, @"No Internet Access...", @"", false, @"icon" + appsettings.Icon.ToString());
                 }
