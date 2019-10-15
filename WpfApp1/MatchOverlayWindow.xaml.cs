@@ -712,11 +712,10 @@ namespace MTGApro
             {
                 try
                 {
-                    string curdrft = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivedraft" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken }, { @"cardsquery", JsonConvert.SerializeObject(MainWindow.TheMatch.Draftdeck) } }, MainWindow.Usertoken);
-                    if (curdrft != @"ERRCONN")
+                    try
                     {
-                        Dictionary<string, Dictionary<int, int>> curdrftparsed = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<int, int>>>(curdrft);
-                        collection = curdrftparsed["col"];
+                        Dictionary<string, Dictionary<int, int>> currentDraft = ApiClient.GetLiveDraft(MainWindow.Usertoken, MainWindow.ouruid, MainWindow.TheMatch.Draftdeck);
+                        collection = currentDraft["col"];
                         PackOpening = MainWindow.TheMatch.DraftPack;
                         PickMacking = MainWindow.TheMatch.DraftPick;
                         overlayme.Children.Clear();
@@ -725,9 +724,9 @@ namespace MTGApro
                         borders[@"draft"].Clear();
                         try
                         {
-                            if (curdrftparsed.ContainsKey("eval"))
+                            if (currentDraft.ContainsKey("eval"))
                             {
-                                renderdeck(curdrftparsed["eval"], 0, @"draft");
+                                renderdeck(currentDraft["eval"], 0, @"draft");
                             }
                         }
                         catch (Exception ee)
@@ -739,6 +738,10 @@ namespace MTGApro
                         opponentlabel.Text = @"Pack: " + (PackOpening + 1).ToString();
                         Setmode(@"draft");
                         decksrendered = false;
+                    }
+                    catch (ConnectionException)
+                    {
+                        // do nothing
                     }
                 }
                 catch (Exception ee)

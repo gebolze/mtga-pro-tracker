@@ -280,6 +280,26 @@ namespace MTGApro.API
             return result;
         }
 
+        public static Dictionary<string, Dictionary<int, int>> GetLiveDraft(string token, string uid, Dictionary<int, int> draftDeck)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    { @"cmd", @"cm_getlivedraft" }, 
+                    { @"uid", uid }, 
+                    { @"token", token }, 
+                    { @"cardsquery", JsonConvert.SerializeObject(draftDeck) }
+                }, 
+                token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<int, int>>>(response);
+            return result;
+        }
+
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
         {
             try
