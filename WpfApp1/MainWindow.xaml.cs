@@ -2040,10 +2040,6 @@ namespace MTGApro
         // Loading initial data on startup
         private void Workerloader_DoWork(object sender, DoWorkEventArgs e)
         {
-            TimeZone localZone = TimeZone.CurrentTimeZone;
-            DateTime currentDate = DateTime.Now;
-            string currentOffset = localZone.GetUtcOffset(currentDate).TotalSeconds.ToString();
-
             try
             {
                 Dictionary<string, string> checkcardsmd5 = checkmd5(@"C:\Program Files (x86)\Wizards of the Coast\MTGA\MTGA_Data\Downloads\Data", "data_cards_*");
@@ -2079,11 +2075,13 @@ namespace MTGApro
             {
 
             }
+            TimeZone localZone = TimeZone.CurrentTimeZone;
+            DateTime currentDate = DateTime.Now;
+            string currentOffset = localZone.GetUtcOffset(currentDate).TotalSeconds.ToString();
 
-            string responseString = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_userbytokenid" }, { @"cm_userbytokenid", tokeninput }, { @"version", version.ToString() }, { @"usertime", currentOffset } }, Usertoken);
-            if (responseString != @"ERRCONN")
+            try
             {
-                Response info = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(responseString);
+                Response info = ApiClient.GetUserByToken(Usertoken, tokeninput, version, currentOffset);
 
                 if (info != null)
                 {
@@ -2184,7 +2182,7 @@ namespace MTGApro
                     }
                 }
             }
-            else
+            catch (ConnectionException)
             {
                 Dispatcher.BeginInvoke(new ThreadStart(delegate
                 {

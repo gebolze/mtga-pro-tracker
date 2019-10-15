@@ -195,6 +195,26 @@ namespace MTGApro.API
             return result;
         }
 
+        public static Response GetUserByToken(string token, string tokeninput, int version, string utcOffset)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_userbytokenid"},
+                    {@"cm_userbytokenid", tokeninput},
+                    {@"version", version.ToString()},
+                    {@"usertime", utcOffset}
+                }, 
+                token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Response>(response);
+            return result;
+        }
+
         public static Dictionary<string, string> GetDateReplacements(string token)
         {
             var response = MakeRequest(
