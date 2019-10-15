@@ -262,6 +262,24 @@ namespace MTGApro.API
             return result;
         }
 
+        public static Deck[] GetUserDecks(string token, string uid)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    { @"cmd", @"cm_getuserdecks" },
+                    { @"uid", uid },
+                    { @"token", token}
+                }, token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Deck[]>(response);
+            return result;
+        }
+
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
         {
             try

@@ -85,15 +85,6 @@ namespace MTGApro
             }
         }
 
-        public class Deck
-        {
-            public int Id { get; set; }
-            public string Classstruct { get; set; }
-            public string Humanname { get; set; }
-            public float wlnratio { get; set; }
-            public float perswinratio { get; set; }
-        }
-
         //Load overlay settings
         public void GetOverlayData()
         {
@@ -995,11 +986,10 @@ namespace MTGApro
                 //Handling decks list rendering
                 try
                 {
-                    string decks = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getuserdecks" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
-                    if (decks != @"ERRCONN")
+                    try
                     {
-                        Deck[] decksparsed = JsonConvert.DeserializeObject<Deck[]>(decks);
-                        if (decksparsed.Length > 0)
+                        var userDecks = ApiClient.GetUserDecks(MainWindow.Usertoken, MainWindow.ouruid);
+                        if (userDecks.Length > 0)
                         {
                             overlayme.Children.Clear();
                             topmargin[@"decks"] = 20;
@@ -1007,7 +997,7 @@ namespace MTGApro
                             borders[@"decks"].Clear();
                             try
                             {
-                                renderdecklist(decksparsed, @"decks");
+                                renderdecklist(userDecks, @"decks");
                             }
                             catch (Exception ee)
                             {
@@ -1017,6 +1007,10 @@ namespace MTGApro
                         }
 
                         Setmode(@"decks");
+                    }
+                    catch (ConnectionException)
+                    {
+                        // do nothing
                     }
                 }
                 catch (Exception ee)
