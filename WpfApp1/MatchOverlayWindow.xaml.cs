@@ -19,6 +19,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Resources;
 using MTGApro.API;
+using MTGApro.API.Models;
 
 namespace MTGApro
 {
@@ -63,42 +64,6 @@ namespace MTGApro
         public static Dictionary<string, string> colors_light = new Dictionary<string, string> { { "White", "bfb66b" }, { "Blue", "8fbdd3" }, { "Black", "726360" }, { "Red", "da8b70" }, { "Green", "92d1a7" }, { "Multicolor", "d6be73" }, { "Colorless", "7a7777" } };
         public static Dictionary<string, string> colors_dark = new Dictionary<string, string> { { "White", "7f7947" }, { "Blue", "28556b" }, { "Black", "4e4442" }, { "Red", "7c3b25" }, { "Green", "2d563a" }, { "Multicolor", "6c5611" }, { "Colorless", "7a7777" } };
         public static Dictionary<string, string> icons_mana = new Dictionary<string, string> { { "White", "\ue600" }, { "Blue", "\ue601" }, { "Black", "\ue602" }, { "Red", "\ue603" }, { "Green", "\ue604" }, { "1", "\ue606" }, { "2", "\ue607" }, { "3", "\ue608" }, { "4", "\ue609" }, { "5", "\ue60a" }, { "6", "\ue60b" }, { "7", "\ue60c" }, { "8", "\ue60d" }, { "9", "\ue60e" }, { "10", "\ue60f" }, { "11", "\ue610" }, { "12", "\ue611" }, { "13", "\ue612" }, { "14", "\ue613" }, { "15", "\ue614" }, { "16", "\ue62a" }, { "17", "\ue62b" }, { "18", "\ue62c" }, { "19", "\ue62d" }, { "20", "\ue62e" }, { "X", "\ue615" } };
-
-
-        public class Card
-        {
-            public int Id { get; set; }
-            public int Doublelink { get; set; }
-            public string Cardid { get; set; }
-            public int Multiverseid { get; set; }
-            public string Name { get; set; }
-            public string Slug { get; set; }
-            public string Kw { get; set; }
-            public string Flavor { get; set; }
-            public int Power { get; set; }
-            public int Toughness { get; set; }
-            public int Expansion { get; set; }
-            public int Rarity { get; set; }
-            public string Mana { get; set; }
-            public int Convmana { get; set; }
-            public int Loyalty { get; set; }
-            public int Type { get; set; }
-            public int Subtype { get; set; }
-            public string Txttype { get; set; }
-            public string Pict { get; set; }
-            public string Date_in { get; set; }
-            public string Colorindicator { get; set; }
-            public int Mtga_id { get; set; }
-            public int Is_collectible { get; set; }
-            public int Reprint { get; set; }
-            public int Supercls { get; set; }
-            public int Draftrate { get; set; }
-            public int Drafteval { get; set; }
-            public int Is_land { get; set; }
-            public string Colorarr { get; set; }
-            public int Currentstandard { get; set; }
-            public string Art { get; set; }
-        }
 
         public class Battle
         {
@@ -206,8 +171,7 @@ namespace MTGApro
             {
                 try
                 {
-                    string cards_db = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/wp-content/plugins/mtgarenapro/js/cards_db_app.js"), new Dictionary<string, object> { }, MainWindow.Usertoken, "GET");
-                    cdb = JsonConvert.DeserializeObject<Dictionary<int, Card>>(cards_db);
+                    cdb = ApiClient.GetCardsDatabase(MainWindow.Usertoken);
                     foreach (KeyValuePair<int, Card> cid in cdb)
                     {
                         if (!cdb_mtga_id.ContainsKey(cid.Value.Mtga_id)) cdb_mtga_id.Add(cid.Value.Mtga_id, cid.Key);

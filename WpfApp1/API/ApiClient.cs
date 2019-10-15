@@ -250,6 +250,18 @@ namespace MTGApro.API
             return result;
         }
 
+        public static Dictionary<int, Card> GetCardsDatabase(string token)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/wp-content/plugins/mtgarenapro/js/cards_db_app.js"),
+                new Dictionary<string, object> { },
+                MainWindow.Usertoken,
+                "GET");
+
+            var result = JsonConvert.DeserializeObject<Dictionary<int, Card>>(response);
+            return result;
+        }
+
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
         {
             try
