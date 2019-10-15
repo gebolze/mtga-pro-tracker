@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using MTGApro.API;
+using MTGApro.API.Models;
 
 namespace MTGApro
 {
@@ -13,30 +14,21 @@ namespace MTGApro
 
     public partial class NotificationsWindow : Window
     {
-
-        public class Notifi
-        {
-            public double Date { get; set; }
-            public string Txt { get; set; }
-
-            public Notifi(int date, string txt)
-            {
-                Date = date;
-                Txt = txt;
-            }
-        }
-
         public NotificationsWindow()
         {
-            string notif = ApiClient.MakeRequest(new Uri(@"https://remote.mtgarena.pro/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getpush" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
-            Notifi[] notifparsed = Newtonsoft.Json.JsonConvert.DeserializeObject<Notifi[]>(notif);
+            Notification[] notifications = ApiClient.GetNotifications(MainWindow.Usertoken, MainWindow.ouruid);
+
             string output = @"";
-            for (int i = 0; i <= (notifparsed.Length - 1); i++)
+            for (int i = 0; i <= (notifications.Length - 1); i++)
             {
-                DateTime date = MainWindow.tmstmptodate(notifparsed[i].Date);
-                string txt = notifparsed[i].Txt;
-                output += @"------------------------" + Environment.NewLine + date.ToString() + @":" + Environment.NewLine + txt + Environment.NewLine + @"------------------------";
+                DateTime date = MainWindow.tmstmptodate(notifications[i].Date);
+                string txt = notifications[i].Txt;
+                output += @"------------------------"
+                          + Environment.NewLine + date + @":" + Environment.NewLine
+                          + txt + Environment.NewLine
+                          + @"------------------------";
             }
+
             Dispatcher.BeginInvoke(new ThreadStart(delegate
             {
                 OutputText.Text = output;

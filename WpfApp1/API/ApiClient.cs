@@ -7,6 +7,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using MTGApro.API.Models;
+using Newtonsoft.Json;
 
 namespace MTGApro.API
 {
@@ -121,6 +122,20 @@ namespace MTGApro.API
             request.Add("loc", CompressFile(eventLocalizationFile));
 
             MakeRequest(new Uri(@"https://mtgarena.pro/mtg/mtgalocloader.php"), request, token);
+        }
+
+        public static Notification[] GetNotifications(string token, string uid)
+        {
+            var response = ApiClient.MakeRequest(new Uri(@"https://remote.mtgarena.pro/donew.php"),
+                new Dictionary<string, object>
+                {
+                    {@"cmd", @"cm_getpush"},
+                    {@"uid", uid},
+                    {@"token", token}
+                }, token);
+
+            var notifications = JsonConvert.DeserializeObject<Notification[]>(response);
+            return notifications;
         }
 
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
