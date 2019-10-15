@@ -300,6 +300,25 @@ namespace MTGApro.API
             return result;
         }
 
+        public static Battle GetLiveMatch(string token, string uid)
+        {
+            var response = MakeRequest(
+                new Uri(@"https://mtgarena.pro/mtg/donew.php"),
+                new Dictionary<string, object>
+                {
+                    { @"cmd", @"cm_getlivematch" },
+                    { @"uid", uid },
+                    { @"token", token }
+                }, 
+                token);
+
+            if (response == "ERRCONN")
+                throw new ConnectionException();
+
+            var result = JsonConvert.DeserializeObject<Battle>(response);
+            return result;
+        }
+
         public static string MakeRequest(Uri uri, Dictionary<string, object> data, string token, string method = "POST")
         {
             try

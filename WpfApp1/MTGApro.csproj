@@ -205,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\ApiClient.cs" />
+    <Compile Include="API\Models\Battle.cs" />
     <Compile Include="API\Models\Card.cs" />
     <Compile Include="API\Models\Deck.cs" />
     <Compile Include="API\Models\Notification.cs" />

@@ -65,26 +65,6 @@ namespace MTGApro
         public static Dictionary<string, string> colors_dark = new Dictionary<string, string> { { "White", "7f7947" }, { "Blue", "28556b" }, { "Black", "4e4442" }, { "Red", "7c3b25" }, { "Green", "2d563a" }, { "Multicolor", "6c5611" }, { "Colorless", "7a7777" } };
         public static Dictionary<string, string> icons_mana = new Dictionary<string, string> { { "White", "\ue600" }, { "Blue", "\ue601" }, { "Black", "\ue602" }, { "Red", "\ue603" }, { "Green", "\ue604" }, { "1", "\ue606" }, { "2", "\ue607" }, { "3", "\ue608" }, { "4", "\ue609" }, { "5", "\ue60a" }, { "6", "\ue60b" }, { "7", "\ue60c" }, { "8", "\ue60d" }, { "9", "\ue60e" }, { "10", "\ue60f" }, { "11", "\ue610" }, { "12", "\ue611" }, { "13", "\ue612" }, { "14", "\ue613" }, { "15", "\ue614" }, { "16", "\ue62a" }, { "17", "\ue62b" }, { "18", "\ue62c" }, { "19", "\ue62d" }, { "20", "\ue62e" }, { "X", "\ue615" } };
 
-        public class Battle
-        {
-            public Dictionary<int, int> Udecklive { get; set; }
-            public Dictionary<int, int> Edeck { get; set; }
-            public Dictionary<int, int> Deckstruct { get; set; }
-            public string Udeck_fp { get; set; }
-            public string Edeckname { get; set; }
-            public string Humanname { get; set; }
-
-            public Battle(Dictionary<int, int> deckstruct, string udeck_fp, string humanname = @"", string edeckname = @"")
-            {
-                Udecklive = new Dictionary<int, int>();
-                Edeck = new Dictionary<int, int>();
-                Edeckname = edeckname;
-                Deckstruct = deckstruct;
-                Udeck_fp = udeck_fp;
-                Humanname = humanname;
-            }
-        }
-
         //Load overlay settings
         public void GetOverlayData()
         {
@@ -754,29 +734,28 @@ namespace MTGApro
             {
                 try
                 {
-                    string curbtl = ApiClient.MakeRequest(new Uri(@"https://mtgarena.pro/mtg/donew.php"), new Dictionary<string, object> { { @"cmd", @"cm_getlivematch" }, { @"uid", MainWindow.ouruid }, { @"token", MainWindow.Usertoken } }, MainWindow.Usertoken);
-                    if (curbtl != @"ERRCONN")
+                    try
                     {
-                        Battle curbtlparsed = JsonConvert.DeserializeObject<Battle>(curbtl);
+                        Battle currentBattle = ApiClient.GetLiveMatch(MainWindow.Usertoken, MainWindow.ouruid);
                         string setmode = @"";
-                        curbtlparsed.Udecklive = MainWindow.TheMatch.Udeck;
-                        curbtlparsed.Edeck = MainWindow.TheMatch.Edeck;
-                        if (curbtlparsed.Edeckname != @"")
+                        currentBattle.Udecklive = MainWindow.TheMatch.Udeck;
+                        currentBattle.Edeck = MainWindow.TheMatch.Edeck;
+                        if (currentBattle.Edeckname != @"")
                         {
-                            opponentdecklabel.Text = curbtlparsed.Edeckname;
+                            opponentdecklabel.Text = currentBattle.Edeckname;
                         }
-                        if (curbtlparsed.Humanname != @"")
+                        if (currentBattle.Humanname != @"")
                         {
-                            mydecklabel.Text = curbtlparsed.Humanname;
+                            mydecklabel.Text = currentBattle.Humanname;
                         }
-                        int ncards = curbtlparsed.Deckstruct.Sum(x => x.Value) - curbtlparsed.Udecklive.Sum(x => x.Value);
+                        int ncards = currentBattle.Deckstruct.Sum(x => x.Value) - currentBattle.Udecklive.Sum(x => x.Value);
 
-                        if (!(curbtlparsed.Udeck_fp == null))
+                        if (!(currentBattle.Udeck_fp == null))
                         {
                             if (matchplayingwe != MainWindow.TheMatch.Matchid)
                             {
                                 matchplayingwe = MainWindow.TheMatch.Matchid;
-                                deckplaying = curbtlparsed.Udeck_fp;
+                                deckplaying = currentBattle.Udeck_fp;
                                 overlayme.Children.Clear();
                                 topmargin[@"me"] = 20;
                                 cnums[@"me"].Clear();
@@ -785,7 +764,7 @@ namespace MTGApro
                                 oldUdecklive.Clear();
                                 try
                                 {
-                                    renderdeck(curbtlparsed.Deckstruct, ncards, @"me", curbtlparsed.Udecklive);
+                                    renderdeck(currentBattle.Deckstruct, ncards, @"me", currentBattle.Udecklive);
                                     mode = "me";
                                     setmode = @"me";
                                 }
@@ -796,7 +775,7 @@ namespace MTGApro
                             }
                             else
                             {
-                                foreach (KeyValuePair<int, int> ucard in curbtlparsed.Deckstruct)
+                                foreach (KeyValuePair<int, int> ucard in currentBattle.Deckstruct)
                                 {
                                     if (ucard.Key != -1)
                                     {
@@ -806,7 +785,7 @@ namespace MTGApro
                                         switch (MainWindow.ovlsettings.Leftdigit)
                                         {
                                             case 0:
-                                                nc = ucard.Value - (curbtlparsed.Udecklive.ContainsKey(ucard.Key) ? curbtlparsed.Udecklive[ucard.Key] : 0);
+                                                nc = ucard.Value - (currentBattle.Udecklive.ContainsKey(ucard.Key) ? currentBattle.Udecklive[ucard.Key] : 0);
                                                 output += nc.ToString();
                                                 break;
                                             case 1:
@@ -814,7 +793,7 @@ namespace MTGApro
                                                 output += nc.ToString();
                                                 break;
                                             case 2:
-                                                nc = (int)Math.Round((double)100 * (ucard.Value - (curbtlparsed.Udecklive.ContainsKey(ucard.Key) ? curbtlparsed.Udecklive[ucard.Key] : 0)) / ncards);
+                                                nc = (int)Math.Round((double)100 * (ucard.Value - (currentBattle.Udecklive.ContainsKey(ucard.Key) ? currentBattle.Udecklive[ucard.Key] : 0)) / ncards);
                                                 output += nc.ToString() + @"%";
                                                 break;
                                             case 3:
@@ -827,13 +806,13 @@ namespace MTGApro
                                         switch (MainWindow.ovlsettings.Rightdigit)
                                         {
                                             case 0:
-                                                output += (ucard.Value - (curbtlparsed.Udecklive.ContainsKey(ucard.Key) ? curbtlparsed.Udecklive[ucard.Key] : 0)).ToString();
+                                                output += (ucard.Value - (currentBattle.Udecklive.ContainsKey(ucard.Key) ? currentBattle.Udecklive[ucard.Key] : 0)).ToString();
                                                 break;
                                             case 1:
                                                 output += ucard.Value;
                                                 break;
                                             case 2:
-                                                output += Convert.ToString(Math.Round((double)100 * (ucard.Value - (curbtlparsed.Udecklive.ContainsKey(ucard.Key) ? curbtlparsed.Udecklive[ucard.Key] : 0)) / ncards)) + @"%";
+                                                output += Convert.ToString(Math.Round((double)100 * (ucard.Value - (currentBattle.Udecklive.ContainsKey(ucard.Key) ? currentBattle.Udecklive[ucard.Key] : 0)) / ncards)) + @"%";
                                                 break;
                                             case 3:
                                                 output += "";
@@ -850,17 +829,17 @@ namespace MTGApro
                                             cnums[@"me"][ucard.Key].Text = output;
                                         }
 
-                                        if (curbtlparsed.Udecklive.ContainsKey(ucard.Key))
+                                        if (currentBattle.Udecklive.ContainsKey(ucard.Key))
                                         {
 
                                             if (!oldUdecklive.ContainsKey(ucard.Key))
                                             {
                                                 needanimate = true;
-                                                oldUdecklive.Add(ucard.Key, curbtlparsed.Udecklive[ucard.Key]);
+                                                oldUdecklive.Add(ucard.Key, currentBattle.Udecklive[ucard.Key]);
                                             }
-                                            else if (oldUdecklive[ucard.Key] != curbtlparsed.Udecklive[ucard.Key])
+                                            else if (oldUdecklive[ucard.Key] != currentBattle.Udecklive[ucard.Key])
                                             {
-                                                oldUdecklive[ucard.Key] = curbtlparsed.Udecklive[ucard.Key];
+                                                oldUdecklive[ucard.Key] = currentBattle.Udecklive[ucard.Key];
                                                 needanimate = true;
                                             }
                                         }
@@ -886,7 +865,7 @@ namespace MTGApro
                                             borders[@"me"][ucard.Key].Background.BeginAnimation(SolidColorBrush.ColorProperty, animation);
                                             setmode = @"me";
                                         }
-                                        if (ucard.Value - (curbtlparsed.Udecklive.ContainsKey(ucard.Key) ? curbtlparsed.Udecklive[ucard.Key] : 0) == 0)
+                                        if (ucard.Value - (currentBattle.Udecklive.ContainsKey(ucard.Key) ? currentBattle.Udecklive[ucard.Key] : 0) == 0)
                                         {
                                             borders[@"me"][ucard.Key].Opacity = 0.6;
                                         }
@@ -896,7 +875,7 @@ namespace MTGApro
                         }
 
 
-                        if (!curbtlparsed.Edeck.ContainsKey(-1))
+                        if (!currentBattle.Edeck.ContainsKey(-1))
                         {
                             if (matchplayingthey != MainWindow.TheMatch.Matchid)
                             {
@@ -908,7 +887,7 @@ namespace MTGApro
                                 opponentdecklabel.Text = @"";
                                 try
                                 {
-                                    renderdeck(curbtlparsed.Edeck, 0, @"opponent");
+                                    renderdeck(currentBattle.Edeck, 0, @"opponent");
                                 }
                                 catch (Exception ee)
                                 {
@@ -918,7 +897,7 @@ namespace MTGApro
                             }
                             else
                             {
-                                foreach (KeyValuePair<int, int> ucard in curbtlparsed.Edeck)
+                                foreach (KeyValuePair<int, int> ucard in currentBattle.Edeck)
                                 {
                                     if (ucard.Key != -1)
                                     {
@@ -977,6 +956,11 @@ namespace MTGApro
                             bottommenu.Margin = new Thickness(0, topmargin[mode], 0, 0);
                         }
                         decksrendered = false;
+
+                    }
+                    catch (ConnectionException)
+                    {
+                        // do nothing
                     }
                 }
                 catch (Exception ee)
