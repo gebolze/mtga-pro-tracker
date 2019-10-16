@@ -1,4 +1,4 @@
-﻿//using DesktopNotifications;
+//using DesktopNotifications;
 //using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
@@ -10,7 +10,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
@@ -37,10 +36,6 @@ namespace MTGApro
     /// 
     public partial class MainWindow : Window
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        private static extern IntPtr GetForegroundWindow();
-
-
         public MatchOverlayWindow matchOverlayWindow = new MatchOverlayWindow();
         public static Parser[] indicators; //Indicators for log parsing recieved from server
         public static string[] dateformats;
@@ -1873,7 +1868,7 @@ namespace MTGApro
 
                         Dispatcher.BeginInvoke(new ThreadStart(delegate
                         {
-                            IntPtr activatedHandle = GetForegroundWindow();
+                            IntPtr activatedHandle = NativeInterfaces.GetForegroundWindow();
                             gamefocused = false;
 
                             WindowInteropHelper wih = new WindowInteropHelper(matchOverlayWindow);
