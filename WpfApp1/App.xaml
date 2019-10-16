@@ -2,11 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MTGApro"
-             StartupUri="MainWindow.xaml">
+             xmlns:s="https://github.com/canton7/Stylet">
     <Application.Resources>
-        <FontFamily x:Key="Beleren">pack://application:,,,/Fonts/#Beleren</FontFamily>
-        <FontFamily x:Key="JaceBeleren">pack://application:,,,/Fonts/#JaceBeleren</FontFamily>
-        <FontFamily x:Key="mana">pack://application:,,,/Fonts/#mana</FontFamily>
-        <FontFamily x:Key="MPlantin">pack://application:,,,/Fonts/#MPlantin</FontFamily>
+        <s:ApplicationLoader>
+            <s:ApplicationLoader.Bootstrapper>
+                <local:Bootstrapper />
+            </s:ApplicationLoader.Bootstrapper>
+
+            <FontFamily x:Key="Beleren">pack://application:,,,/Fonts/#Beleren</FontFamily>
+            <FontFamily x:Key="JaceBeleren">pack://application:,,,/Fonts/#JaceBeleren</FontFamily>
+            <FontFamily x:Key="mana">pack://application:,,,/Fonts/#mana</FontFamily>
+            <FontFamily x:Key="MPlantin">pack://application:,,,/Fonts/#MPlantin</FontFamily>
+        </s:ApplicationLoader>
     </Application.Resources>
 </Application>
